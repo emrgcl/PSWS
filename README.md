@@ -1,1 +1,1 @@
-# PSWS
+# Powershell Workshop Sample scirpts repository
