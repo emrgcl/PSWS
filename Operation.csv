@@ -1,0 +1,5 @@
+﻿Server,CPUCount,Memory,OS
+server1,4,16,Ubuntu
+server2,4,16,Windows 2016
+server3,8,32,Windows 2016
+server4,16,128,windows 2019
