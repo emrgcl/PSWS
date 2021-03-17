@@ -222,6 +222,8 @@ $DaysToExpire = @{
 }
 gci Cert:\LocalMachine\My | Select-Object -Property Thumbprint,Subject,$DaysToExpire
 
+# getting established connections example using select object and hashtable
+Get-NetTCPConnection -State Established | Select-Object -Property LocalAddress,RemoteAddress,LocalPort,@{Name ='ProcesName';Expression={(get-process -id $_.OwningProcess).Name}}
 
 $HTMLHeader=@"
 <style>
