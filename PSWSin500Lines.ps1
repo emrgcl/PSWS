@@ -229,7 +229,29 @@ $DaysToExpire = @{
 }
 gci Cert:\LocalMachine\My | Select-Object -Property Thumbprint,Subject,$DaysToExpire
 
+#region Common External commands and Powerhell replacements
 
+# nslookup, ping, telnet, netstat, ipconfig
+
+#ping - Test-Connection
+Test-Connection -ComputerName $env:COMPUTERNAME -Count 5 
+
+#telnet - TEst-netconnection
+Test-NetConnection $env:COMPUTERNAME -port 445 | fl *
+
+#nslookup - resolve-dns
+Resolve-DnsName -Name mail.yahoo.com | Select-Object Address,IpAddress,Type
+
+#ipconfig - Get-NetIPConfiguration
+Get-NetIPConfiguration
+
+#list ip adress
+(Get-NetIPAddress -PrefixOrigin Dhcp -AddressFamily IPv4).IPAddress
+
+#netstat - get-nettcpconnection
+Get-NetTCPConnection -State Established | Select-Object -Property LocalAddress,RemoteAddress,LocalPort,@{Name ='ProcesName';Expression={(get-process -id $_.OwningProcess).Name}}
+
+#endregion
 $HTMLHeader=@"
 <style>
 
