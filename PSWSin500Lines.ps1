@@ -48,6 +48,7 @@ $ServiceName.Substring(0,2)
 # değişkeni kullanalım
 Get-Service -Name $ServiceName
 #endregion
+
 #region string object
 
 # Literal String
@@ -182,6 +183,12 @@ $Server2 = New-ServerInfo -OSName 'Windows 2012' -Memory 8 -CPU 8 -Owner 'Taylan
 $Server3 = New-ServerInfo -Memory 8 -CPU 8 -Owner 'Taylan','Emre'
 $Server5 = New-ServerInfo -OSName 'Windows 2016' -Memory 32 -CPU 8 -Hostname Srv5
 
+#endregion
+
+#region foreach loop
+#endregion
+
+#region Introduction to pipelines
 #endregion
 
 #region Static Members (Member = Property , Method
