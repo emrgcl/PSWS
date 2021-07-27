@@ -11,6 +11,9 @@ In this Workshop You will be able to;
 - Handle errors
 - Learn Powershell Remoting
 
+# Content
+the content is actually a powershell script around 500 lines here in repository. PSWSin500Lines.ps1.
+
 # Day 1
 ## Introduction
  
