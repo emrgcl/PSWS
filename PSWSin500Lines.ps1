@@ -1,5 +1,4 @@
 # string, int, array, hashtable, pscustomboject, scriptblock, DateTime,TimeSpan, math
-# greetings to Taylan!
 
 #region PowerShellVErsion
 $PSVersionTable
