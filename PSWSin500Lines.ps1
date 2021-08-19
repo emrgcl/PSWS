@@ -197,6 +197,14 @@ $Server5 = New-ServerInfo -OSName 'Windows 2016' -Memory 32 -CPU 8 -Hostname Srv
 
 #endregion
 
+#region Alias
+
+#get all aliases of the specified cmdlet.
+Get-Alias | Where-Object  { $_.ReferencedCommand.Name -eq 'Get-ChildItem'}
+
+#endregion
+
+
 #region Select-Object
 
 gci Cert:\LocalMachine\My | Select-Object -Property Thumbprint,Subject,NotAfter
