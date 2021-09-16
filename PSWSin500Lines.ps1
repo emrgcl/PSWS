@@ -440,21 +440,26 @@ New-ModuleManifest -Path C:\temp\Modules\TDUtility\TDUtility.psd1
 
 #endregion
 
-#region error handling - Basic
+#region error handling - Introduction
 
-# hatalar $error arrayine gider
-Get-Service -Name hedehodo -ErrorAction SilentlyContinue
+# 1) Cmdlet Errors / Functions Errors () - Non-Terminating
+Get-Service -Name 'olmayanservice', 'spooler'
 
-if(-not $?) {
+# convert non-terminating error to terminating
+Get-Service -Name 'olmayanservice', 'spooler' -ErrorAction Stop  
 
-"an error occured: Message = $($Error[0].Exception.Message)"
+# 2) Logical errors / language - Terminating
+1/0
+[int32]'32a'
 
+# 3) .net method errors
+$Browser = [System.Net.WebClient]::new()
+$FileToDownloadURL = 'https://github.com/emrgcl/MonitorAccountLockouts/releases/download/1.0.0.30/SCOM.MonitorAccountLockouts_1.0.0.30.zip'
+$FileToDownloadURLWrong = 'https://github.com/emrgcl/MonitorAccountLockouts/releases/download/1.0.0.30/SCOM.MonitorAccountLockouts_1.0.0.30___.zip'
+$Destination = 'C:\Temp\downloadtest\SCOM.MonitorAccountLockouts_1.0.0.30.zip'
 
-}
-
-
-
-#endregion
+# error occurs below - Terminating
+$Browser.downloadfile($FileToDownloadURLWrong,$Destination)
 
 #region error handling -try catch finally
 
