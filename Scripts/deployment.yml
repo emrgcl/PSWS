@@ -1,0 +1,42 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: surface
+spec:
+  selector:
+    matchLabels:
+      app: api
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: api
+        esbNodeName: Surface
+        isEsbNode: 'true'
+    spec:
+      containers:
+        - name: api
+          image: _NULL_/surfaceapp:066ede701fb225a9f57123f8ddd381e868aa299d
+          ports:
+            - containerPort: 5000
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health/live  
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+          readinessProbe:
+            failureThreshold: 20
+            httpGet:
+              path: /health/ready
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
