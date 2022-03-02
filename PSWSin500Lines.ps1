@@ -1,265 +1,549 @@
-# string, int, array, hashtable, pscustomboject, scriptblock, DateTime,TimeSpan, math
 
-#region PowerShellVErsion
+# We are going to learn: String, int32, Array, Hasthable, PscustomOBject, Math, Datetime, ScriptBlock, Boolean(bool), TimeSpan
+# .net = > FCL - Framework Class Library + CLI (.net runtime)
+
+#region PowerShellVersion
+<# 
+1) Bill Gates, 
+2) Mark Russinovich (NT Kernel, troubleshooing - Vice President of Azure, Windows Internals 1-2, Sysinternal (Procmon, psexec)
+3) Jeffrey Snover - Entprise ARchitect of Powershell (Inventor)
+2005: Powerhell invented - monad (Powershell v1) (Object Based (Windows .Net) + Clean Code Princples + Terminal)
+2008: windows .net out of box with Windows Server and Clients (windows 2008, windows 7 - Powershell v2) ( the it focusing on virutalization: migrating from physical machines to vms)
+2012: Critical year - Mature Azure / Cloud Services released (Powershell v3 - windows 2012 - windows .net oob, 2012r2 -v4)
+2014: Satya Nadella became CEO - Microsoft Loves Open Source / Linux (Migrating from VMS => Continairs (Virtual OS) )
+2016: .Net Core released - Cross platform works on windows, linux etc(Windows 10, Windows Server 2016i windows.net, powershell 5.1)
+2018: Powershell 6 - .Net Core
+2020: Powershell 7 - were as promised .net core based, you can call windows powrshell modules
+
+
+#>
 $PSVersionTable
 
-<#
-Recommended Powershell: 5.1 => https://docs.microsoft.com/en-us/powershell/scripting/windows-powershell/wmf/setup/install-configure?view=powershell-7.1
-Command Format: Verb-Noun
-#>
-#endregion
-
-#region CmdLet Introduction - Discovering CMDlets
-# lists all available commands
-get-command 
-
-# lists specified command
-get-command -Verb get
-Get-command -Noun service
-
-# lists all commands in specified module
-Get-Command -Module Microsoft.PowerShell.Management
-
-# how to use a command?
-get-command -Name get-service -Syntax
+# if you need to upgrade powershell - https://www.microsoft.com/en-us/download/details.aspx?id=54616 (5.1
+# Powershell 7.2 is already a seperate indstallation: https://github.com/PowerShell/powershell/releases
 
 #endregion
 
-#region Discovering Objects
-# To get all properties on an object
+#region Discovering Cmdlet Introduction
+
+# syntax of command names  - verb-noun structure
+Get-Command
+
+# to get a specic command
+get-command -Noun 'Service'
+
+# how to run the command
+Get-command -Name 'Get-Service' -Syntax
+
+Get-Service -Name 'Spooler','ALg' -ComputerName 'emreg-web01','emreg-web02'
+
+#how to get commands in a specific module
+Get-Command -Module 'Microsoft.PowerShell.Management'
+
+#endregion
+
+#region discovering objects - Part 1
+get-Service -name 'Spooler'
+
 Get-Service -Name 'spooler' | Format-List -Property *
 
-# Show all members of an object
+#endregion
+
+#region Discovering Objects - Part 2
+
 Get-Service -Name 'Spooler' | Get-Member
 
+
 #endregion
 
-#region Variables
-$ServiceName = 'Spooler'
-
-# değişkeni de get-membere gönderek ilgili ojbectin tipi ve özelliklerini görebiliriz.
+#region Variables - always always includes object(s)
+$ServiceName = 'Spooler' 
 $ServiceName | Get-Member
-
-# objectnin özelliklerine erişmek veya bir methodu çalıştırmak
 $ServiceName.Length
-$ServiceName.Substring(0,2)
+$ServiceName.Substring(0,3)
 
-# değişkeni kullanalım
+$SMSMessage = 'Thomas old old thomas Thomas old old thomas the wolf dragon the guru  old old thomas the wolf dragon the guru  old old thomas the wolf dragon the guru old old thomas the wolf dragon the guru  old old thomas the wolf dragon the guru old old thomas the wolf dragon the guru  old old thomas the wolf dragon the guru  old old thomas the wolf dragon the guru  old old thomas the wolf dragon the guru'
+$SMSMessage.Length
+$Result = $SMSMessage.Substring(1,160)
+$Result.Length
+
+Get-Command -Name 'Get-Service' -Syntax
+
 Get-Service -Name $ServiceName
+
+
 #endregion
 
-#region string object
+#region Working with string objects 
 
-# Literal String
-$Age = 44
-$Message = 'Emre $Age yaşındadır.'
+#Literal Strings - ''
 
-# Expandable String
-$Message = "Emre $Age yaşındadır."
-
-# SubExpression - Asprin()
-Stop-Service -InputObject (Get-Service -Name 'Spooler')
-
-#Variable subexpression  - String içinde komut kullanma
-$Service = Get-Service -Name 'Spooler'
-$Message = "üzerinde çalışacağım serivisn adı: $Service.Name"
+$Age = 45
+$Message = 'Emre is $Age years old.'
 $Message
-$Message = "üzerinde çalışacağım serivisn adı: $($Service.Name)"
+
+$Message = 'Emre is ' + $Age + ' years old.'
 $Message
-$Message = "üzerinde çalışacağım serivisn adı: $((Get-Service -Name 'Spooler').Name)"
+
+
+
+#Expandable Strings - ""
+$Age = 45
+$Message = "Emre is $Age years old."
 $Message
+
+'I need $dollars more.'
+
+# Escape character - `
+<#
+
+Escpae Character Workflow  turns
+1. Stop your primary job
+2. start your secondary job
+
+#>
+
+$Name = 'Thomas'
+"I need `$dollars more from you $Name."
+
+$SMSMessage =  "Dear $Name``s,`n I hope you find this sms useful.`n The info is nothing:P"
+$SMSMessage
+
+
+# SubExpression - Asprin - () - Temporay Variable
+
+$Message = 'I love Powershell'
+$Message.Length
+
+('I Love Powershell').Length
+(Get-Service -Name Spooler).DisplayName
+
+# variable subexpression - $()
+
+"There are $((('I Love Powershell').Substring(0,3)).Length)"
+
 #endregion
 
-#region Type Casting (weak/strong) = Tipini belirleme (zayıf / kuvvetli)
+#region Powershell - Help
+# Cmdlet Help - Man pages- documentation of the commands
 
-# Zayıf
-$Message = [string]'olksjdflkjsdf'
-$Message = 32
+Get-Help -Name 'Get-Service'-ShowWindow
+ 
+# conceptual help - About_ - How To
+get-help -name about_sp*
+Get-Help -Name about_Special_Characters -ShowWindow
 
-# Güçlü
-[string]$Message = 'ilksıdjflsjdlfds'
+#endregion
+
+#region Type Casting
+
+# Strong Type casting
+[string]$Message = 'Sth stupid'
 [string]$Message = 32
+
+# Weak Type Casting
+$Message = [string]32
+
+$Number = [int32]'32' + 5
+$Number
+
+
+
 #endregion
 
-#region Hashtable
+#region ScriptBlock - code block - Nameless Function
 
-$ServerInfo = @{'OSName' = 'Windows Server 2016';'Memory' = 16}
+$ScriptBlock = {get-service -Name 'spooler'}
+$ScriptBlock | gm
+$ScriptBlock.Invoke()
+
+#endregion
+
+#region hashtables - dictionary - Key and Value pairs 
 
 $ServerInfo = @{
 
-                  'OSName' = 'Windows Server 2016'
-                  'Memory' = 16
+    OSName = 'Windows 10'
+    NumberofCPU = 16
+    OWner = 'Emre'
 
 }
 
-# kelimenin anlamı
+#getting info from hashtable
+$ServerInfo['OsName']
 $ServerInfo.OSName
-$ServerInfo['OSName']
 
-$ServerInfo['CPU']=4
-$ServerInfo.Add('Owner','Taylan')
+$ServerInfo | Get-Member
+$ServerInfo.Add('MemoryGB',64)
+$ServerInfo.Add('Hostname','server1')
 
-# key / kelime kontrolü
-$ServerInfo.Keys -contains 'CPU'
-
-#endregion
-
-#region PScustomOBject, Array, Arraylist
-
-
-$ServerInfo = [PSCustomObject]@{
-
-                  'OSName' = 'Windows Server 2016'
-                  'Memory' = 16
-                  'CPU' = 4
-                  'Owner' = 'Levent'
-                  'Hostname' = 'srv1'
-
-}
-
-$ServerInfo2 = [PSCustomObject]@{
-
-                  'OSName' = 'Windows Server 2019'
-                  'Memory' = 64
-                  'CPU' = 8
-                  'Owner' = 'Emre'
-                  'Hostname' = 'srv2'
- 
-}
-
-
-[System.Collections.ArrayList]$Servers = $ServerInfo,$ServerInfo2
-
-$Servers | ? {$_.Owner -eq 'Emre'}
-
-
-#endregion
-
-#region string to array , array to string
-
-$List='file1,file2,file3,file4,file5,file6,file7,file8'
-$FileList = $List -split ','
-
-Write-Output "The following files were edited. $FileList"
-
-$StringFromArray=$FileList -join ','
-Write-Output "The following files were edited. $StringFromArray"
-
-#endregion
-
-#region introduction to advanced functions
-
-Function New-ServerInfo {
-
-[CmdLetBinding()]
-Param(
-      [Parameter(Mandatory=$true)]
-      [string]$OSName,
-      [Parameter(Mandatory=$true)]
-      [int32]$Memory,
-      [Parameter(Mandatory=$true)]
-      [int32]$CPU,
-      [string[]]$Owners=@('Taylan'),
-      [Parameter(Mandatory=$true)]
-      [string]$Hostname
-)
-
-$ServerInfo = [PScustomObject]@{
-
-                  'OSName' = $OSName
-                  'Memory' = $Memory
-                  'CPU' = $CPU
-                  'Owner' = $Owners
-                  'Hostname' = $Hostname
-}
 
 $ServerInfo
 
+#Keys and Value
+
+#endregion 
+
+#region - Working with wmi
+
+
+Get-WmiObject -Class win32_operatingsystem | Get-Member
+
+$ServerInfo = @{
+    
+    OSName = (Get-WmiObject -Class Win32_operatingsystem).Caption
+    MemoryGB = (Get-WmiObject -Class Win32_operatingsystem).TotalVisibleMemorysize * 1024 / 1gb
+    NumberOfProcessors = [int32](Get-WmiObject -Class Win32_computersystem).NumberOfLogicalProcessors
+    OWner = (Get-WmiObject -Class Win32_computersystem).PrimaryOwnerName
+
+}
+$ServerInfo
+
+$ServerInfo.ContainsKey('OSname')
+$ServerInfo.ContainsValue(32)
+$ServerInfo.NumberOfProcessors | gm
+
+
+
+$SomeHasthable = @{Name = 'Emre';SurName='Guclu';email='emreg@microsoft.com'}
+
+#endregion
+
+#region creating your own objects 
+
+Get-Service -Name 'spooler', 'alg' | Export-Csv -Path c:\temp\services.csv -NoTypeInformation
+
+$ServerInfo | Export-Csv -Path C:\temp\serverinfo.csv
+
+$ServerInfoOBj = [Pscustomobject]@{
+    
+    OSName = (Get-WmiObject -Class Win32_operatingsystem).Caption
+    MemoryGB = (Get-WmiObject -Class Win32_operatingsystem).TotalVisibleMemorysize * 1024 / 1gb
+    NumberOfProcessors = [int32](Get-WmiObject -Class Win32_computersystem).NumberOfLogicalProcessors
+    OWner = (Get-WmiObject -Class Win32_computersystem).PrimaryOwnerName
+
 }
 
-$Server1 = New-ServerInfo -OSName 'Windows 2019' -Memory 4 -CPU 8 -Owner 'Taylan' -Hostname Srv1
-$Server2 = New-ServerInfo -OSName 'Windows 2012' -Memory 8 -CPU 8 -Owner 'Taylan' -Hostname Srv2
-$Server3 = New-ServerInfo -Memory 8 -CPU 8 -Owner 'Taylan','Emre'
-$Server5 = New-ServerInfo -OSName 'Windows 2016' -Memory 32 -CPU 8 -Hostname Srv5
+$ServerInfoOBj | export-csv -Path C:\temp\serverinfoobj.csv
+
+#endregion 
+
+#region Arrays and ArrayLists
+
+$MyArray = @('Alberto Martinez','Jorge','Bruno',345)
+Get-Member -InputObject $MyArray
+# the number of elements/objects/items in the array
+$MyArray.Count
+
+# the first element in the array (by default - 0)
+$MyArray[0]
+
+# the last element in the array (by default - -1)
+$MyArray[-1]
+
+# range operator - int..int - get first 2 elements
+$MyArray[0..1]
+
+# getting index of an object
+$MyArray.IndexOf(345)
+
+#adding objects to basic array
+$MyArray.Add('Miriam') # wont work for Basic Array (system.array)
+$MyArray = $MyArray + 'Miriam' 
+$MyArray += 'Miriam'
+
+#adding objects to a more advanced array - System.Collections.ARraylist
+$MyArrayList = [System.Collections.ArrayList]@('Alberto Martinez','Jorge','Bruno',345)
+$MyArrayList.Add('Miriam')
+
+#controling if an object exists in array , 'by default operators' = > Case insensitive
+$MyArrayList -contains 'miriam'
+
+# case sensitive contains
+$MyArrayList -ccontains 'miriam'
+
+
+#endregion 
+
+#region don't return objects using [void] or out-bull
+
+[void]$MyArrayList.Add('Carlos')
+$MyArrayList.Add('Kamran') | Out-Null
 
 #endregion
 
-#region foreach loop
+#region looping in arrays with Foreach
+
+$SErverInfo1 = [PscustomObject]@{
+
+    Hostname = 'Server1'
+    CPU = 16
+    MemmoryGB = 64
+    OSName = 'Windows 2016'
+    Owner = 'Carlos'
+
+}
+$SErverInfo2 = [PscustomObject]@{
+
+    Hostname = 'Server2'
+    CPU = 8
+    MemmoryGB = 16
+    Owner = 'Thomas'
+
+}
+
+$SErverInfo3 = [PscustomObject]@{
+
+    Hostname = 'Server3'
+    CPU = 32
+    MemmoryGB = 128
+    Owner = 'Miriam'
+
+}
+
+$Servers = [System.Collections.ArrayList]@($SErverInfo1,$SErverInfo2,$SErverInfo3)
+
+# Looping with Foreach
+
+Foreach ($Server in $Servers) {
+
+
+
+    if ($Server.Owner -eq 'Thomas') {
+
+    "Working on $($Server.Hostname)"
+
+    }
+
+
+}
+
+
 #endregion
 
-#region Introduction to pipelines
+#region looping in Arays with Pipeline! - |
+
+#Filtering in Pipeline
+$Servers | Where-Object -FilterScript {$_.Owner -eq 'Thomas'}
+$Servers | Where {$_.owner -eq 'Thomas'}
+$Servers | ? {$_.owner -eq 'Thomas'}
+
+#Do Operations in Pipeline
+$Servers | Where-Object -FilterScript {$_.Owner -eq 'Thomas'} | ForEach-Object -Process { "Working on $($_.Hostname)"}
+
+# bad way of preparations
+$Servers | ForEach-Object -Process { 
+'Importing some module' # operations required before the main operaiton
+"Working on $($_.Hostname)"
+'Processing finished' # operation required after the main operation
+}
+# use begin and end blocks for operations
+$Servers | ForEach-Object -Begin {'Importing some module'} -Process { "Working on $($_.Hostname)"} -End {'Processing finished'}
+
+Get-Service -Name 'Spooler' | Stop-Service
+
+$CustomStupidObject = [PscustomObject]@{
+
+    Name = 'spooler'
+    Owner = 'Thomas'
+
+}
+
+$CustomStupidObject | Stop-Service
+
+Get-Command -Name Stop-Service -Syntax
+
+# go through each parameter and see th pipeline options
+get-help Stop-Service -ShowWindow
+
 #endregion
 
-#region Static Members (Member = Property , Method
+#region String to array , array to string
 
+# string to array with -split operator -lets get the last element in below string
+$List = 'file1,file2,file3,file4,file5'
+
+# lets split and create an array
+$FileListArray = $List -split ','
+$LastFile = $FileListArray[-1]
+
+# same with 1-liner approach
+($List -split ',')[-1]
+
+$FileListarray = @('file1 file2','file3','file4','file5')
+$FileListString = $FileListArray -join ','
+"Working on files: $FileListString"
+
+
+#endregion
+
+#region introduction advanced Functions
+# legacy functions
+Function do-sthbasic ($Name) {
+
+"Hello $Name"
+
+}
+
+do-sthbasic -Name 'Kamran'
+
+# ADvanced Function
+Function new-serverinfo {
+
+[CmdletBinding()]
+Param(
+    [Parameter(Mandatory=$true)]
+    [string]$Osname,
+    [Parameter(Mandatory=$true)]
+    [int32]$memoryGB,
+    [string]$Owner,
+    [Parameter(Mandatory=$true)]
+    [string]$Hostname
+)
+
+[Pscustomobject]@{
+
+    Osname = $Osname
+    MemoryGB = $memoryGB
+    Owner = $Owner
+    Hostname = $Hostname
+
+}
+
+
+}
+
+$Server1 = New-ServerInfo -OSName 'Windows 2019' -MemoryGB 4 -Owner 'Walter' -Hostname 'Server1'
+New-ServerInfo -OSName 'Windows 2019' -MemoryGB 4  -Hostname 'server3'
+
+# use get-verb to name your functions Verb portion
+
+#endregion
+
+#region Switch Parameter
+
+Function Get-InternetInformation {
+
+[CmdletBinding()]
+Param(
+    [Parameter(Mandatory=$true)]
+    [string]$URL,
+    [switch]$EnableDirectAcces
+
+)
+if ($EnableDirectAcces.IsPresent) {
+
+"accessing $URL over firewall"
+
+} else {
+
+"accessing $url over proxy"
+
+}
+
+
+}
+
+Get-InternetInformation -URL 'http:/blabla.com/blabla' -EnableDirectAcces
+
+#endregion
+
+#region static members
+$ServiceObject = Get-Service -Name 'Spooler' 
+# get-member on the object dont show static members
+$ServiceObject | Get-Member
+$ServiceObject.Name
+
+# use the following to see the static members
 [math] | Get-Member -Static
-[Math]::Round(23432.234234,2)
+[math]::PI
+[math]::Round(3.14159265358979,2)
+[math]::Round(3.14159265358979)
+
+[string] | Get-Member -Static
+
+$STring = $null
+
+if ($STring -eq '' -or $String -eq $null) {
+
+'string is empty or null'
+
+}
+
+if([string]::IsNullOrEmpty($String)) {
+
+'string is empty or null'
+
+}
+
+[Pscustomobject]@{
+    
+    OSName = (Get-WmiObject -Class Win32_operatingsystem).Caption
+    MemoryGB = [Math]::Round((Get-WmiObject -Class Win32_operatingsystem).TotalVisibleMemorysize * 1024 / 1gb)
+    NumberOfProcessors = [int32](Get-WmiObject -Class Win32_computersystem).NumberOfLogicalProcessors
+    OWner = (Get-WmiObject -Class Win32_computersystem).PrimaryOwnerName
+
+}
 
 #endregion
 
-#region Alias
+#region Providers & Report certificate expirations
+# List of existing drives of providers
+Get-PSDrive
 
-#get all aliases of the specified cmdlet.
-Get-Alias | Where-Object  { $_.ReferencedCommand.Name -eq 'Get-ChildItem'}
+# to access drive use what you already know : )
+cd c:\
+Set-Location c:\
+Set-Location -Path c:\
+Set-Location Cert:
+
+dir
+gci
+Get-ChildItem
+
+Set-Location -Path Cert:\LocalMachine\My
+dir
 
 #endregion
 
+#region select-object
 
-#region Select-Object
+# format table only formats the object for only console..
+gci Cert:\LocalMachine\My | Format-Table -Property Thumbprint,NotAfter | Export-Csv C:\Temp\table.csv
 
-gci Cert:\LocalMachine\My | Select-Object -Property Thumbprint,Subject,NotAfter
-
-# custom field / özel kolon üretmek => özel hahstable => @{Name='';Expression={}}
-
-gci Cert:\LocalMachine\My | Select-Object -Property Thumbprint,Subject,NotAfter,@{Name='DaysToExpire';Expression={$_.NotAfter}}
+# use selecet-object to cut the properties and form a new object with the properties you desire
+gci Cert:\LocalMachine\My | Select-Object -Property Thumbprint,NotAfter | Export-Csv C:\Temp\selectresult.csv
 
 
 $DaysToExpire = @{
+
+Name = 'DaysToExpire'
+Expression = {
     
-    Name='DaysToExpire'
-    Expression={
-        $Days = [math]::Round(($_.NotAfter - (Get-Date)).TotalDays,2)
-        
-        if ($Days -le 1) {
-            
-            'Expired'
-        
-        } else {
-        
-        $Days
-        
-        }
-        
+    $NumberOFDays = [Math]::Round(($_.NotAfter - (Get-Date)).TotalDays,2)
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # !!!! For the sake of demonstration the below threshold is 1 please change it to -le 0 in production. !!!!
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if ($NumberOFDays -le 1) {
     
+
+    'Expired'
+
+    
+    } else {
+        $NumberOFDays
     }
 
 }
-gci Cert:\LocalMachine\My | Select-Object -Property Thumbprint,Subject,$DaysToExpire
 
-#region Common External commands and Powerhell replacements
-
-# nslookup, ping, telnet, netstat, ipconfig
-
-#ping - Test-Connection
-Test-Connection -ComputerName $env:COMPUTERNAME -Count 5 
-
-#telnet - TEst-netconnection
-Test-NetConnection $env:COMPUTERNAME -port 445 | fl *
-
-#nslookup - resolve-dns
-Resolve-DnsName -Name mail.yahoo.com | Select-Object Address,IpAddress,Type
-
-#ipconfig - Get-NetIPConfiguration
-Get-NetIPConfiguration
-
-#list ip adress
-(Get-NetIPAddress -PrefixOrigin Dhcp -AddressFamily IPv4).IPAddress
-
-#netstat - get-nettcpconnection
-Get-NetTCPConnection -State Established | Select-Object -Property LocalAddress,RemoteAddress,LocalPort,@{Name ='ProcesName';Expression={(get-process -id $_.OwningProcess).Name}}
+}
+gci Cert:\LocalMachine\My | Select-Object -Property Thumbprint,$DaysToExpire | ConvertTo-Html| Out-File -FilePath c:\temp\thomas.html
+Invoke-expression c:\temp\thomas.html
 
 #endregion
-$HTMLHeader=@"
+
+#region here string - ignores single or dobule  quatoes - especially any type of external code like html, json, xml
+$HTMLHeader = @'
 <style>
 
     table {
@@ -288,222 +572,329 @@ $HTMLHeader=@"
         background: #f0f0f2;
     }
 </style>
-
-"@
-
-$Result = gci Cert:\LocalMachine\My | Select-Object -Property Thumbprint,Subject,$DaysToExpire 
-$Result | ConvertTo-Html -Title 'Certificate Report' -head $HTMLHeader  | Out-File -FilePath c:\temp\cert.html
+'@
+$HtmlOutuput = 'c:\temp\thomas1.html'
+$Result = gci Cert:\LocalMachine\My | Select-Object -Property Thumbprint,$DaysToExpire | ConvertTo-Html -Head $HTMLHeader
+# lets do a replace for an even better looking html where expired is red and bold! 
+$result | ForEach-Object -Process {$_ -replace  '<td>Expired</td>','<td bgcolor="red" color ="white"><b><Font Color = "White">Expired</Font></b></td>'} | Out-File -FilePath $HtmlOutuput
+Invoke-expression $HtmlOutuput
 
 #endregion
 
-#region Importing from disk
+#region Common External Commands and Powershell Replacements
+# ping vs test-connection
+$Result = ping EMREG-DESKTOP
+get-member -InputObject $Result
+$Result[-1]
 
-$ServersFromTxt = Get-Content C:\temp\servers.txt
+(Test-Connection -ComputerName 'yahoo.com' | Measure-Object -Property Responsetime -Average -Maximum -Minimum).Average
 
+# telnet vs - test-netconnection
+Test-NetConnection -ComputerName 'emreg-desktop' -Port 445
+
+#nslookup vs resolve-dns
+$YahooIps=(Resolve-DnsName -Name yahoo.com -Type A).IpAddress
+
+#ipconfig vs get-netipconfiguration
+Get-NetIPConfiguration
+
+#list ip address
+(Get-NetIPAddress -PrefixOrigin Dhcp -AddressFamily IPv4).IPAddress
+
+# netstat - get-nettcpconnection figure out connection issues
+$ProcessName = @{
+
+    Name = 'ProcessName'
+    Expression = {(Get-Process -id $_.OWningProcess).ProcessName}
+
+}
+
+Get-NetTCPConnection -State Established -RemotePort 443 | Select-Object -Property RemoteAddress, $ProcessName | Where-Object -FilterScript {$_.PRocessName -eq 'teams'}
+
+#endregion
+
+#region Importing From Disk / Exporting to Disk
+$TextPath = 'C:\temp\servers.txt'
+$CsvPath = 'c:\temp\servers.csv'
+
+#lets do the basic stuff first - read a text file.
+$Content = Get-Content -Path $TextPath
+Get-Member -InputObject $Content
+# since this is an object array I can index into 
+$Content[0]
+$Content[-1]
+
+#lets work with csv file
+$CSVContent = Import-Csv -Path $CsvPath
+# its again an object array
+Get-Member -InputObject $CSVContent
+# lets see what is the type of objects within the array by sneding the array to pipeline
+$CSVContent | Get-Member
+
+$CSVContent | Where-Object {$_.Memory -gt 4}
+
+#endregion
+
+#region AdvancedFunctions - Pipeline support - Convert to int if you can :)
 
 Function ConvertTo-Int32 {
 
-[CmdletBinding()]
+[Cmdletbinding()]
 Param(
 
-[Parameter(ValueFromPipeLine=$true)]
+[Parameter(ValueFromPipeline=$true)]
 [PSCustomObject]$InputObject
-
 )
 
-Process {
 
-$ConvertedProperties = @{}
+Process {
+$ConverTedProperties = @{}
+
 $Properties = ($_ | Get-Member -MemberType NoteProperty).Name
 Foreach ($Property in $Properties) {
 
-if ($_.$Property -as [int32]) {
 
-$ConvertedProperties.Add($Property,($_.$Property -as [int32]))
+if ($Null -ne ($_.$Property -as [int32])) {
+
+$ConverTedProperties.Add($Property,($_.$Property -as [int32]))
 
 } else {
 
-$ConvertedProperties.Add($Property,($_.$Property))
+$ConverTedProperties.Add($Property,($_.$Property))
+
+}
+
+}
+
+
+[PSCustomObject]$ConverTedProperties
 
 }
 
 
 }
 
-[PsCustomObject]$ConvertedProperties
-
-}
-
-
-}
-
-$Servers = Import-Csv -Path C:\temp\ServerList.csv | ConvertTo-Int32
-
+$Servers = $CSVContent | ConvertTo-Int32
+$Servers | Where-Object -FilterScript {$_.Memory -gt 8}
+$Servers | gm
 #endregion
 
-#region Advanced Functions - More
+#region AdvancedFunctions - Risk Mitigation
 
-Function say-hello {
+Function Delete-VirtualMachine {
+
 
 [CmdletBinding(
-
-    PositionalBinding = $False
+    
+    SupportsShouldProcess=$true,
+    ConfirmImpact='High'
 
 )]
 Param(
-    [ValidateNotNullOrEmpty()]
-    [ValidateLength(3,30)]
-    [Parameter(ParameterSetName='Name')]
+
+[Parameter(ValueFromPipeline = $true)]
+[string[]]$ServerName,
+[String[]]$ExcludedServers
+
+)
+
+Process {
+    Foreach ($Server in $ServerName) {
+    if ($ExcludedServers -notcontains $Server -or $ExcludedServers.Count -eq 0) {
+        
+        if ($pscmdlet.ShouldProcess($Server, 'Deleting VM'))
+        {
+            "Deleted the vm: $Server"
+        }
+    }
+        
+    
+    }
+}
+}
+
+Delete-VirtualMachine -ServerName 'Server1'
+Delete-VirtualMachine -ServerName 'Server1','Server2'
+Get-content -Path $TextPath | Delete-VirtualMachine -WhatIf -ExcludedServers @('Server4.contoso.com')
+Get-Content -Path $TextPath | Delete-VirtualMachine -Confirm:$false
+
+Get-command -Name Delete-VirtualMachine -Syntax
+
+#endregion
+
+#region AdvancedFunction - Parameter Validation - continued
+
+
+#validate script
+Function Get-ServerList {
+
+[Cmdletbinding()]
+Param(
+[ValidateScript({test-path $_})]
+[string]$FilePath
+)
+
+$Content = get-content -Path $FilePath
+
+"critical operation based on the content"
+
+}
+
+Get-ServerList -FilePath c:\temp\sthsth.txt
+
+#validate stirng, integers and sets
+
+Function Say-Hello {
+
+[CmdletBinding()]
+Param(
+    [Parameter(ParameterSetName='x')]
+    [ValidateLength(3,50)]
     [string]$Name,
-    [Parameter(ParameterSetName='FullName')]
+    [Parameter(ParameterSetName='y')]
     [string]$FullName,
-    [Parameter(Mandatory=$true)]
-    [ValidateRange(18,65)]
+    [ValidateRange(18,150)]
     [int32]$Age,
-    [Parameter(Mandatory=$true)]
     [ValidateSet('Male','Female')]
     [string]$Gender
-)
-
-switch ($Gender)
-{
-'Male' {
-            if($PSCmdlet.ParameterSetName -eq 'Name')
-            {
-            
-                $Message = "Merhaba $Name. Yaşın da maşallah $Age olmuş."
-            
-            } else {
-            
-                $Message = "Merhaba Sayın $FullName. Yaşınız $Age ."
-            
-            } 
-       }
-
-'Female' {
-            if($PSCmdlet.ParameterSetName -eq 'Name')
-            {
-            
-                $Message = "Merhaba $Name."
-            
-            } else {
-            
-                $Message = "Merhaba Sayın $FullName."
-            
-            }             
-            
-}
-
-}
-
-Write-output -InputObject $Message
-
-}
-
-Say-hello -Name 'Emre' -Age 44 -Gender 'Male'
-Say-hello -Name 'nihal' -Age 28 -Gender 'Female'
-
-
-Function Delete-Email {
-
-[CmdletBinding(
-
-    SupportsShouldProcess = $true
-
-)]
-Param(
-    
-    [Parameter(Mandatory=$true,ValueFromPipeLine=$true)]
-    [string[]]$Email
 
 )
-Process {
 
-        if ($pscmdlet.ShouldProcess($email, "deleting email"))
-        {
-            Write-Output "Deleted $Email"
+Switch ($gender) {
+
+  'Male' {
+            if($PSCmdlet.ParameterSetName -eq 'x') {
+                "Hello $Name. Congrats with your age $Age!"
+             } else {
+             
+                "Hello Mr. $FullName. Congratulations with your age $Age. Anything I may help more?"
+             }
+                
+         }
+  'Female' {
+        
+        if($PSCmdlet.ParameterSetName -eq 'x') {
+        "Hello $Name. are you really $([math]::Round(($Age/2+5))) : )" 
+        } else {
+        "Hello Miss. $FullName. are you really $([math]::Round(($Age/2+5))) mam? : )" 
+
+        }
         }
 
-
 }
 }
 
 
+Say-hello -Name 'Emre Guclu'  -Age 0
+Say-hello -Name 'Emre'  -Age 45 -Gender 'Male'
+Say-Hello -Name 'Miriam' -Age 35 -Gender 'Female'
+Say-Hello -Name 'Miriam Surname' -Age 35 -Gender 'Female'
 
 
-Delete-Email -Email 'emreg@microsoft.com'
+Say-Hello -FullName 'Carlos Velle' -Age 45 -Gender 'Male'
+#endregion
+
+#region Module Fundementals
+
+# lists currently imported modules
+Get-Module
+# list all alvailable modules
+Get-Module -ListAvailable
+
+#Modules locations in windows
+$env:PSModulePath -split ';'
+
+Find-Module -Name *cluster*
+
+Install-Module -Name Cluster -Scope AllUsers -AllowClobber -Force -Verbose
+#endregion
+
+#region Module - creating or own modules
+
+#1) create a psm1 file with the name of the module - this includes Functions
+
+#2) create a psd1 file using new-modulemanifest
+New-ModuleManifest -Path C:\temp\MyModule\MyModule.psd1 -Author 'Emre' -CompanyName 'Contoso' -RootModule 'MyModule.psm1' -ModuleVersion '1.1.0'
+
 
 #endregion
 
-#region creating modules
-New-ModuleManifest -Path C:\temp\Modules\TDUtility\TDUtility.psd1
+#region error handling - introduction
 
-#endregion
+# 1) CmdLet error - Nonterminating - can be Converted into terminating errors
+Get-service -Name 'nonexistingservice','Spooler'
 
-#region error handling - Introduction
+# system default is managed by $ErrorActionPreference
+$ErrorActionPreference
+e -Name 'nonexistingservice','Spooler' -ErrorAction Stop
+Get-servic
 
-# 1) Cmdlet Errors / Functions Errors () - Non-Terminating
-Get-Service -Name 'olmayanservice', 'spooler'
+# 2) Logical / Language Errors - Terminating - cannot convert to nonterminating errors
+1 / 0
+[int32]'sdf'
 
-# convert non-terminating error to terminating
-Get-Service -Name 'olmayanservice', 'spooler' -ErrorAction Stop  
-
-# 2) Logical errors / language - Terminating
-1/0
-[int32]'32a'
-
-# 3) .net method errors
-$Browser = [System.Net.WebClient]::new()
+# 3) .net - Terminating - cannot convert to nonterminating errors
+$Browser  = [System.Net.WebClient]::New()
 $FileToDownloadURL = 'https://github.com/emrgcl/MonitorAccountLockouts/releases/download/1.0.0.30/SCOM.MonitorAccountLockouts_1.0.0.30.zip'
 $FileToDownloadURLWrong = 'https://github.com/emrgcl/MonitorAccountLockouts/releases/download/1.0.0.30/SCOM.MonitorAccountLockouts_1.0.0.30___.zip'
-$Destination = 'C:\Temp\downloadtest\SCOM.MonitorAccountLockouts_1.0.0.30.zip'
+$Browser.DownloadFile($FileToDownloadURLWrong, 'C:\temp\sth.zip')
 
-# error occurs below - Terminating
-$Browser.downloadfile($FileToDownloadURLWrong,$Destination)
+# all errors to go $error (max 256)
+$Error[0]
 
-#region error handling -try catch finally
 
-$WEbclient = new-object -TypeName System.Net.WebClient
-$ErrorCount = 0
-try {
+#endregion
 
-Get-Service -Name Spooler -ErrorAction Stop # default erroaction continue
-#$WEbclient.DownloadFile('https://github.com/emrgcl/PSWS/blob/main/Operation1.csv','c:\temp\download\Operation.csv') # erroction stop
+#region legacy error handling
+# $? returns the sucess state of the previous line
+$LogPath = 'c:\temp\mylogfile.txt'
+Get-Service -Name 'Spoolerxx' -ErrorAction SilentlyContinue
+if (-not $?) {
 
-}
+"[$(Get-Date -Format G)] An  fatal error occured: $($Error[0].Exception.Message)" | Out-File -FilePath $LogPath -Append
 
-catch {
-++$ErrorCount
-"An Error occured. $($Error[0].Exception.Message)."
-
-}
-
-finally {
-
-if ($ErrorCount -eq 0) {
-'Operation completed Successfully.'
-
-} else {
-
-"Operation completed with errors. Number of errors occured: $ErrorCount."
-} 
-
-'Removing httpclient.'
-$WEbclient.Dispose()
 
 }
 
 
 #endregion
 
-#region remoting
+#region modern error handling using try catch finally
 
 
+try {
+
+#Get-Service -Name 'Spooler' -ErrorAction Stop
+#1 / 0
+$Browser  = [System.Net.WebClient]::New()
+$FileToDownloadURL = 'https://github.com/emrgcl/MonitorAccountLockouts/releases/download/1.0.0.30/SCOM.MonitorAccountLockouts_1.0.0.30.zip'
+#$FileToDownloadURLWrong = 'https://github.com/emrgcl/MonitorAccountLockouts/releases/download/1.0.0.30/SCOM.MonitorAccountLockouts_1.0.0.30___.zip'
+$Browser.DownloadFile($FileToDownloadURL, 'C:\temp\sth.zip')
+$Log = "[$(Get-Date -Format G)] Sucessfully downloaded file."
+}
+
+Catch {
+
+$Log = "[$(Get-Date -Format G)] An error occured. $($Error[0].Exception.Message)" 
+
+}
+
+# finally 
+Finally {
+
+$log | Out-File -FilePath $LogPath -Append
+$webClient.Dispose()
+
+}
+
+#endregion
+
+#region Powershell Remoting
 $Servers = 'emreg-web01','emreg-web02','emreg-web03'
 
 # Legacy remoting
 
-Get-Service -Name ALG,Spooler -ComputerName $Servers # RPC TCP 135, 1024
+Get-Service -Name ALG,Spooler -ComputerName $Servers # RPC TCP 135, 1024 | stop-ser
 
 # list commands supporting computername parameter
 Get-Command -ParameterName ComputerName
@@ -512,16 +903,29 @@ Get-Command -ParameterName ComputerName
 
 $scriptBlock = {Get-Service -Name Alg,Spooler}
 
-$SleepScript = {1..50 | % {'.';Start-Sleep -Seconds 1}}
+$SleepScript = {1..500 | ForEach-Object {'.';Start-Sleep -Seconds 1}}
 
 # 1. Temporary Session (100'e kullan)
 Invoke-Command -ComputerName $Servers -ScriptBlock $scriptBlock
+foreach ($Server in $Servers) {
 
+Invoke-Command -ComputerName $Server -ScriptBlock $scriptBlock
+
+}
 # 2. Persistent Session (1000 sunucu için daha mantıklıklı)
 $session = New-PSSession -ComputerName $Servers
-Invoke-command -Session $session[1] -ScriptBlock $SleepScript -AsJob
+Invoke-command -Session $session[1] -ScriptBlock $SleepScript -AsJob 
+
+
 Invoke-Command -Session $session -ScriptBlock $scriptBlock
+
+Invoke-Command -Session $session -ScriptBlock $SleepScript
+
+if ($session[1].Availability -eq 'Available') {
+
+get-job |receive-job
+
+}
+
 Remove-PSSession -Session $session
-
 #endregion
-
