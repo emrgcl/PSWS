@@ -909,6 +909,38 @@ $webClient.Dispose()
 
 }
 
+Function Test-Port {
+Param(
+[Parameter(Mandatory = $true)]
+[string]$Hostname,
+[Parameter(Mandatory = $true)]
+[int32]$Port
+)
+try {
+$TcpCLient = [System.Net.Sockets.TcpClient]::new()
+$TcpCLient.Connect($Hostname,$Port)
+$Connected = $true
+}
+
+catch {
+
+$connected = $False
+
+}
+Finally {
+[PScustomOBject]@{
+
+    Hostname = $HostName
+    Connected = $Connected
+    Port = $Port
+
+
+}
+$TcpCLient.Dispose()
+}
+}
+Test-Port -Hostname emreg-desktop -Port 446
+
 #endregion
 
 #region Powershell Remoting
