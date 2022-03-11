@@ -807,16 +807,38 @@ $env:PSModulePath -split ';'
 Find-Module -Name *cluster*
 
 Install-Module -Name Cluster -Scope AllUsers -AllowClobber -Force -Verbose
+
 #endregion
 
 #region Module - creating or own modules
 
-#1) create a psm1 file with the name of the module - this includes Functions
+# create a folder to work on
+New-Item -Path 'C:\Temp' -Name 'PSUtil'  -ItemType Directory
 
-#2) create a psd1 file using new-modulemanifest
-New-ModuleManifest -Path C:\temp\MyModule\MyModule.psd1 -Author 'Emre' -CompanyName 'Contoso' -RootModule 'MyModule.psm1' -ModuleVersion '1.1.0'
+<#
 
+Module
+1) .psd1 Module manifest = module configuration options
+- version information
+- requirements
+- which functions to export.
+2) .psm1: this file will include all functions
+#>
 
+# creating a manifest
+$ModuleName = 'PSutil'
+$ModulePath = "C:\temp\$ModuleName"
+New-ModuleManifest -Path "$ModulePath\$ModuleName.psd1" -Author 'Emre Guclu' -CompanyName 'Contoso' -ModuleVersion '1.0.0.1'  -Description 'utility module for everyone'
+psedit "$ModulePath\$ModuleName.psd1"
+
+Copy-Item -Path $ModulePath -Destination 'C:\Program Files\WindowsPowerShell\Modules' -Recurse -Verbose -Force
+
+psedit "C:\Program Files\WindowsPowerShell\Modules\$moduleName\$moduleName.psd1"
+
+Get-Module -ListAvailable | where {$_.Name -eq $ModuleName }
+
+Import-Module -Name $ModuleName -Verbose -Force
+get-command -Module $ModuleName 
 #endregion
 
 #region error handling - introduction
