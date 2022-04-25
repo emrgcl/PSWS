@@ -120,3 +120,21 @@ the content is actually a powershell script around 500 lines here in repository.
 - Learn basic / legacy remoting options capatabilites
 - use Powershell Sessions for advanced Remoting
 - Learn Temporary vs Persistent session differences
+
+
+# Optional: You can work on the files using Vscdode and Github 
+
+If your IT lets you or if you already have Vscode and Git for windows we can do the workhop using VSCode instead of Powershell ISE.
+
+1. Download and install following files
+    - [Download and Install Git For Windows](https://github.com/git-for-windows/git/releases/download/v2.36.0.windows.1/Git-2.36.0-64-bit.exe)
+    - [Download and Instasll Vscdode](https://az764295.vo.msecnd.net/stable/dfd34e8260c270da74b5c2d86d61aee4b6d56977/VSCodeUserSetup-x64-1.66.2.exe)
+
+1. Initial Git congiruation: Run the followings for inital git setup
+```PowerShell
+
+git config --global user.name "John Doe"
+git config --global user.email johndoe@example.com
+# below line is only required if you are using a proxy server
+git config --global http.proxy http://proxy.server.com:port
+```
