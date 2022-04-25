@@ -122,7 +122,7 @@ the content is actually a powershell script around 500 lines here in repository.
 - Learn Temporary vs Persistent session differences
 
 
-# Optional: You can work on the files using Vscdode and Github 
+# Optional: You can work on the files using Vscode and Github 
 
 If your IT lets you or if you already have Vscode and Git for windows we can do the workhop using VSCode instead of Powershell ISE.
 
